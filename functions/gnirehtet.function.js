@@ -10,7 +10,7 @@ const batFilePath = path.join(__dirname, 'start_gnirehtet.bat');
 module.exports = {
   autoRunGnirehtet: async () => {
     console.log('Dừng gnirehtet.exe');
-    nodeCmd.runSync(`taskkill /F /IM gnirehtet.exe`);
+    // nodeCmd.runSync(`taskkill /F /IM gnirehtet.exe`);
 
     console.log('Chia sẻ kết nối ngược');
 
@@ -26,7 +26,7 @@ module.exports = {
       nodeCmd.runSync(`"${gnirehtetFolder}" stop ${device.id}`);
     }
     console.log('Dừng gnirehtet.exe');
-    nodeCmd.runSync(`taskkill /F /IM gnirehtet.exe`);
+    // nodeCmd.runSync(`taskkill /F /IM gnirehtet.exe`);
     await delay(1000);
   }
 };
