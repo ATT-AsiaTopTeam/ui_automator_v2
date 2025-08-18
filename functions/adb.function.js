@@ -72,16 +72,16 @@ module.exports = {
 
   checkDevice: async ({ device_id }) => {
     try {
-      const deviceModel = await deviceHelper.getDeviceModel(device_id);      
-  
+      const deviceModel = await deviceHelper.getDeviceModel(device_id);
+
       const deviceCoordinates = coordinates[deviceModel];
-      console.log('log deviceCoordinates:', deviceCoordinates);         
-      
-      if (deviceCoordinates == undefined) {        
+      console.log('log deviceCoordinates:', deviceCoordinates);
+
+      if (deviceCoordinates == undefined) {
         console.log(`No coordinates found for device model: ${deviceModel}`);
-        return { status: 500, valid: false, message: 'Thiết bị chưa hỗ trợ' };    
+        return { status: 500, valid: false, message: 'Thiết bị chưa hỗ trợ' };
       }
-  
+
       return deviceCoordinates;
     } catch (error) {
       console.error(`Error checking device: ${error.message}`);
@@ -90,7 +90,7 @@ module.exports = {
   },
 
   checkDeviceFHD: async ({ device_id }) => {
-    try {      
+    try {
       const deviceModel = await deviceHelper.getDeviceModel(device_id);
       console.log(`Device model: ${deviceModel}`);
 
@@ -116,28 +116,29 @@ module.exports = {
     }
   },
 
-  inputADBVTB: async ({ device_id, text }) => {  
+  inputADBVTB: async ({ device_id, text }) => {
     const coordinates = await loadCoordinatesForDevice(device_id);
-    
+
     for (const char of text) {
+      console.log("🚀 ~ char:", char)
       if (isUpperCase(char)) {
-          await adbHelper.tapADBVTB(device_id, ...coordinates['CapsLock']);
-          await sleep(50); 
-          await adbHelper.tapADBVTB(device_id, ...coordinates[char]);
-          await sleep(50);
+        await adbHelper.tapADBVTB(device_id, ...coordinates['CapsLock']);
+        await sleep(50);
+        await adbHelper.tapADBVTB(device_id, ...coordinates[char]);
+        await sleep(50);
       }
       else if (isSpecialChar(char)) {
-          await adbHelper.tapADBVTB(device_id, ...coordinates['!#1']);
-          await sleep(50); 
-          await adbHelper.tapADBVTB(device_id, ...coordinates[char]);
-          await sleep(50); 
-          await adbHelper.tapADBVTB(device_id, ...coordinates['ABC']);
-      }        
-      else {
-          await adbHelper.tapADBVTB(device_id, ...coordinates[char.toLowerCase()]);
+        await adbHelper.tapADBVTB(device_id, ...coordinates['!#1']);
+        await sleep(50);
+        await adbHelper.tapADBVTB(device_id, ...coordinates[char]);
+        await sleep(50);
+        await adbHelper.tapADBVTB(device_id, ...coordinates['ABC']);
       }
-              
-      await sleep(50); 
+      else {
+        await adbHelper.tapADBVTB(device_id, ...coordinates[char.toLowerCase()]);
+      }
+
+      await sleep(50);
     }
     return { status: 200, message: 'Success' };
   },
@@ -253,9 +254,9 @@ async function loadCoordinatesForDevice(device_id) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const isSpecialChar = (char) => {
-  return ['@', '#', '$', '%', '&', '*', '-', '+', '(', ')', 
-          '~', '^', '<', '>', '|', '\\', '{', '}', '[', ']', 
-          '=', '!', '"', "'", ':', ';', '/', '?'].includes(char);
+  return ['@', '#', '$', '%', '&', '*', '-', '+', '(', ')',
+    '~', '^', '<', '>', '|', '\\', '{', '}', '[', ']',
+    '=', '!', '"', "'", ':', ';', '/', '?'].includes(char);
 };
 
 const isUpperCase = (char) => {
