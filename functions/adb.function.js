@@ -72,10 +72,17 @@ module.exports = {
 
   checkDevice: async ({ device_id }) => {
     try {
-      const deviceModel = await deviceHelper.getDeviceModel(device_id);
+      const deviceModel = await deviceHelper.getDeviceModel(device_id);      
 
-      const deviceCoordinates = coordinates[deviceModel];
-      console.log('log deviceCoordinates:', deviceCoordinates);
+      let deviceCoordinates;
+      
+      if (deviceModel === 'ONEPLUS A5010'){
+        deviceCoordinates = coordinates['A5010'];
+        console.log(`log coordinates['A5010']`, coordinates['A5010']);
+      } 
+      else{
+        deviceCoordinates = coordinates[deviceModel];
+      }      
 
       if (deviceCoordinates == undefined) {
         console.log(`No coordinates found for device model: ${deviceModel}`);
@@ -237,19 +244,44 @@ module.exports = {
 };
 
 // dùng cho inputADBVTB bên trên
+// async function loadCoordinatesForDevice(device_id) {
+//   try {
+//     const deviceModel = await deviceHelper.getDeviceModel(device_id);
+//     console.log('deviceModel now:', deviceModel);
+
+//     const deviceCoordinates = coordinates[deviceModel];
+//     // xử lý ở đây là nếu model mà có include ONEPLUS thì sẽ lấy [1] là A5010
+
+//     return deviceCoordinates;
+//   } catch (error) {
+//     console.error(`Error loading coordinates for device: ${error.message}`);
+//     throw error; // Re-throw error for the caller to handle
+//   }
+// };
 async function loadCoordinatesForDevice(device_id) {
   try {
-    const deviceModel = await deviceHelper.getDeviceModel(device_id);
-    console.log('deviceModel now:', deviceModel);
+    const model = await deviceHelper.getDeviceModel(device_id); // ví dụ "ONEPLUS A5010"
+    // Chuẩn hoá về key trong JSON
+    let key = model.trim();
 
-    const deviceCoordinates = coordinates[deviceModel];
+    // ONEPLUS A5010 -> A5010
+    if (/ONEPLUS/i.test(key) && /A5010/i.test(key)) key = 'A5010';
 
+    // Bạn có thể bổ sung thêm các rule khác nếu cần:
+    // if (/SM-N960/i.test(key)) key = 'SM-N960';
+
+    const deviceCoordinates = coordinates[key];
+
+    if (!deviceCoordinates) {
+      console.log(`No coordinates found for model "${model}" (key dùng: "${key}")`);
+      return null; // hoặc throw new Error(...)
+    }
     return deviceCoordinates;
-  } catch (error) {
-    console.error(`Error loading coordinates for device: ${error.message}`);
-    throw error; // Re-throw error for the caller to handle
+  } catch (err) {
+    console.error(`Error loading coordinates for device: ${err.message}`);
+    throw err;
   }
-};
+}
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
